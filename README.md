@@ -3,6 +3,7 @@ Reactビギナーズガイドのサンプルプログラムをwebpack2環境で�
 
 * [Reactビギナーズガイド](https://www.oreilly.co.jp/books/9784873117881/)
 * [原書のサンプルコード](https://github.com/stoyan/reactbook)
+* [原書のライブデモ](http://www.whinepad.com/)
 * [React](https://facebook.github.io/react/)
 * [webpack](https://webpack.github.io/)
 * [Babel](https://babeljs.io/)
