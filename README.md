@@ -1,5 +1,5 @@
 # Reactビギナーズガイド・サンプルプログラム
-Reactビギナーズガイドのサンプルプログラムをwebpack2環境で構築.
+Reactビギナーズガイドのサンプルプログラムをcreate-react-appで構築.
 
 * [Reactビギナーズガイド](https://www.oreilly.co.jp/books/9784873117881/)
 * [原書のサンプルコード](https://github.com/stoyan/reactbook)
