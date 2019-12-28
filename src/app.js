@@ -1,22 +1,23 @@
-/* @flow */
-
-'use strict';
-
-import CRUDStore from './flux-imm/CRUDStore';
-import Logo from './components/Logo';
-import React from 'react';
-import ReactDOM from 'react-dom';
-import Whinepad from './components/Whinepad';
-import schema from './schema';
+import "./App.css";
+import CRUDStore from "./flux-imm/CRUDStore";
+import Logo from "./components/Logo";
+import React from "react";
+import Whinepad from "./components/Whinepad";
+import schema from "./schema";
 
 CRUDStore.init(schema);
 
-ReactDOM.render(
-    <div>
+function App() {
+  return (
+    <React.Fragment>
+      <div>
         <div className="app-header">
-            <Logo /> Whinepadにようこそ!
+          <Logo /> Whinepadにようこそ!
         </div>
-        <Whinepad />
-    </div>,
-    document.getElementById('pad')
-);
+      </div>
+      <Whinepad />
+    </React.Fragment>
+  );
+}
+
+export default App;

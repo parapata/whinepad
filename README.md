@@ -33,16 +33,35 @@ $ yarn install
 
 ### 開発サーバ起動
 ```bash
-$ yarn run start
+$ yarn start
 ```
 
 ### ビルド
 ```bash
-$ yarn run build
+$ yarn build
+```
+
+### テスト
+```bash
+$ yarn test
+```
+
+### テスト
+```bash
+$ yarn test
+```
+
+### flow-typeのインストール
+```bash
+$ flow-typed install --skip
 ```
 
 改訂履歴
 -------------
+### 2019-12-28
+- create-react-appベースに変更
+- 依存ライブラリ更新
+
 ### 2017-05-07
 - 新規登録
 

@@ -1,8 +1,7 @@
 /* @flow */
 
-import React from 'react';
+import React from "react";
 
-let Logo = () => <div className="Logo"/>;
+let Logo = () => <div className="Logo" />;
 
-export default Logo
-
+export default Logo;

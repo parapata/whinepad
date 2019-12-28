@@ -2,14 +2,15 @@
 .*/node_modules/.*
 .*/public/.*
 .*/coverage/.*
+.*/build/.*
 
 [include]
-node_modules/classnames
-node_modules/invariant
-node_modules/fbemitter
 
 [libs]
-flow-typed
+
+[lints]
 
 [options]
-esproposal.class_static_fields=enable
+module.name_mapper='^\([^\.].*\)$' -> '<PROJECT_ROOT>/src/\1'
+
+[strict]
