@@ -10,7 +10,9 @@ type Props = {
 
 const Button = (props: Props) =>
   props.href ? (
-    <a {...props} className={classNames("Button", props.className)} />
+    <a {...props} className={classNames("Button", props.className)}>
+      {props.children}
+    </a>
   ) : (
     <button {...props} className={classNames("Button", props.className)} />
   );
