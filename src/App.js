@@ -7,7 +7,7 @@ import schema from "./schema";
 
 CRUDStore.init(schema);
 
-function App() {
+const App = () => {
   return (
     <React.Fragment>
       <div>
@@ -18,6 +18,6 @@ function App() {
       <Whinepad />
     </React.Fragment>
   );
-}
+};
 
 export default App;

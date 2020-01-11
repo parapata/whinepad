@@ -13,15 +13,9 @@ type Props = {
 };
 
 class Form extends Component<Props> {
-  //fields: Array<FormInputField>;
   fields: Array<Object>;
   initialData: ?Object;
-/*
-  static defaultProps = {
-    readonly: false,
-    recordId: 1
-  };
-*/
+
   constructor(props: Props) {
     super(props);
     this.fields = CRUDStore.getSchema();
