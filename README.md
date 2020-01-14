@@ -18,46 +18,21 @@ $ npm install -g yarn
 
 ### ダウンロード
 ```bash
-$ git clone https://github.com/parapata/whinepad.git [YOUR_APPNAME]
-$ cd [YOUR_APPNAME]
+$ git clone https://github.com/parapata/whinepad.git
+$ cd whinepad
 $ rm -rf .git (windows> rd /S /Q .git)
+$ cd [sub_project_directory]
 $ git init
 $ git add -A
 $ git commit -m "Initial commit with whinepad"
 ```
 
-### パッケージのインストール
-```bash
-$ yarn install
-```
-
-### 開発サーバ起動
-```bash
-$ yarn start
-```
-
-### ビルド
-```bash
-$ yarn build
-```
-
-### テスト
-```bash
-$ yarn test
-```
-
-### テスト
-```bash
-$ yarn test
-```
-
-### flow-typeのインストール
-```bash
-$ flow-typed install --skip
-```
-
 改訂履歴
 -------------
+### 2020-01-11
+- react-hooks版サンプルソース追加
+- プロジェクト分割
+
 ### 2020-01-11
 - Discoverモジュール追加
 
