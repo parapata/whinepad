@@ -1,6 +1,8 @@
+/* @flow */
+
 import Actions from "./components/Actions";
 import Button from "./components/Button";
-//import CRUDStore from "./flux-imm/CRUDStore";
+import CRUDStore from "./flux-imm/CRUDStore";
 import Dialog from "./components/Dialog";
 import Form from "./components/Form";
 import FormInput from "./components/FormInput";
@@ -8,10 +10,10 @@ import Logo from "./components/Logo";
 import Rating from "./components/Rating";
 import React from "react";
 import Suggest from "./components/Suggest";
-//import schema from "./schema";
+import schema from "./schema";
 import "./App.css";
 
-//CRUDStore.init(schema);
+CRUDStore.init(schema);
 
 const Discover = () => {
   return (
@@ -100,27 +102,11 @@ const Discover = () => {
 
       <h2>Form</h2>
 
-      <Form
-        fields={[
-          { label: "Rating", type: "rating", id: "rateme" },
-          { label: "Greetings", id: "freetext" }
-        ]}
-        initialData={{ rateme: 4, freetext: "Hello" }}
-      />
+      <Form />
 
       <h2>Form readonly</h2>
 
-      <Form
-        fields={[
-          { label: "Rating", type: "rating", id: "rateme" },
-          { label: "Greetings", id: "freetext" }
-        ]}
-        initialData={{ rateme: 4, freetext: "Hello" }}
-        readonly={true}
-      />
-
-      {/*
-       */}
+      <Form readonly={true} recordId={0} />
 
       <h2>Actions</h2>
       <div>

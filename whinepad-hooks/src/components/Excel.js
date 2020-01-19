@@ -1,96 +1,105 @@
+/* @flow */
+
+import * as Immutable from "immutable";
 import Actions from "./Actions";
+import CRUDActions from "../flux-imm/CRUDActions";
+import CRUDStore from "../flux-imm/CRUDStore";
 import Dialog from "./Dialog";
 import Form from "./Form";
 import FormInput from "./FormInput";
 import Rating from "./Rating";
-import React, { useEffect, useRef, useState } from "react";
-import PropTypes from "prop-types";
+import React, { useRef, useState } from "react";
 import classNames from "classnames";
+import invariant from "invariant";
 
-const Excel = props => {
-  const [data, setData] = useState(props.initialData);
-  const [sortby, setSortdy] = useState(null); // schema.id
-  const [descending, setDescending] = useState(false);
-  const [edit, setEdit] = useState(null); // [row index, schema.id],
-  const [dialog, setDialog] = useState(null); // {type, idx}
+type EditState = {
+  row: number,
+  key: string
+};
 
-  useEffect(() => {
-    setData(props.initialData);
-  }, [props.initialData]);
+type DialogState = {
+  idx: number,
+  type: string
+};
+
+type Props = {||};
+
+const Excel = (props: Props) => {
+  const [data, setData]: Immutable.List<Object> = useState(CRUDStore.getData());
+  const [sortby, setSortby]: ?string = useState(null); // schema.id
+  const [descending, setDescending]: boolean = useState(false);
+  const [edit, setEdit]: EditState = useState(null); // [row index, schema.id],
+  const [dialog, setDialog]: DialogState = useState(null); // {type, idx}
 
   const formRef = useRef();
   const formInputRef = useRef();
 
-  const _fireDataChange = data => {
-    props.onDataChange(data);
+  const schema: Array<Object> = CRUDStore.getSchema();
+
+  CRUDStore.addListener("change", () => {
+    setData(CRUDStore.getData());
+  });
+
+  const _sort = (key: string) => {
+    const res = sortby === key && !descending;
+    CRUDActions.sort(key, res);
+    setSortby(key);
+    setDescending(res);
   };
 
-  const _sort = key => {
-    let workData = Array.from(data);
-    const flg = sortby === key && !descending;
-    workData.sort((a, b) =>
-      flg ? (a[key] < b[key] ? 1 : -1) : a[key] > b[key] ? 1 : -1
-    );
-    setData(workData);
-    setSortdy(key);
-    setDescending(flg);
-    _fireDataChange(workData);
-  };
-
-  const _showEditor = e => {
+  const _showEditor = (e: Event) => {
+    const target = ((e.target: any): HTMLElement);
     setEdit({
-      row: parseInt(e.target.dataset.row, 10),
-      key: e.target.dataset.key
+      row: parseInt(target.dataset.row, 10),
+      key: target.dataset.key
     });
   };
 
-  const _save = e => {
+  const _save = (e: Event) => {
     e.preventDefault();
-    const value = formInputRef.current.getValue();
-    let workData = Array.from(data);
-    workData[edit.row][edit.key] = value;
+    invariant(edit, "Messed up edit state");
+    CRUDActions.updateField(
+      edit.row,
+      edit.key,
+      formInputRef.current.getValue()
+    );
     setEdit(null);
-    setData(workData);
-    _fireDataChange(workData);
   };
 
-  const _actionClick = (rowidx, action) => {
+  const _actionClick = (rowidx: number, action: string) => {
+    console.log("★_actionClick");
     setDialog({ type: action, idx: rowidx });
   };
 
-  const _deleteConfirmationClick = action => {
+  const _deleteConfirmationClick = (action: string) => {
+    console.log("★_deleteConfirmationClick");
+    setDialog(null);
+    console.log(action);
     if (action === "dismiss") {
-      _closeDialog();
       return;
     }
-    let workData = Array.from(data);
-    workData.splice(dialog.idx, 1);
-    setDialog(null);
-    setData(workData);
-    _fireDataChange(workData);
+    const index = dialog && dialog.idx;
+    invariant(typeof index === "number", "Unexpected dialog state");
+    CRUDActions.delete(index);
   };
 
-  const _closeDialog = () => {
+  const _saveDataDialog = (action: string) => {
+    console.log("★_saveDataDialog");
     setDialog(null);
-  };
-
-  const _saveDataDialog = action => {
     if (action === "dismiss") {
-      _closeDialog();
       return;
     }
-    let targetData = Array.from(data);
-    targetData[dialog.idx] = formRef.current.getData();
-    setDialog(null);
-    setData(targetData);
-    _fireDataChange(targetData);
+    const index = dialog && dialog.idx;
+    invariant(typeof index === "number", "Unexpected dialog state");
+    CRUDActions.updateRecord(index, formRef.current.getData());
   };
 
   const _renderDialog = () => {
     if (!dialog) {
       return null;
     }
-    switch (dialog.type) {
+    const type = dialog.type;
+    switch (type) {
       case "delete":
         return _renderDeleteDialog();
       case "info":
@@ -98,12 +107,14 @@ const Excel = props => {
       case "edit":
         return _renderFormDialog();
       default:
-        throw Error(`Unexpected dialog type ${dialog.type}`);
+        throw Error(`Unexpected dialog type ${type}`);
     }
   };
 
   const _renderDeleteDialog = () => {
-    const first = data[dialog.idx];
+    const index = dialog && dialog.idx;
+    invariant(typeof index === "number", "Unexpected dialog state");
+    const first = data.get(index);
     const nameguess = first[Object.keys(first)[0]];
     return (
       <Dialog
@@ -117,7 +128,9 @@ const Excel = props => {
     );
   };
 
-  const _renderFormDialog = readonly => {
+  const _renderFormDialog = (readonly: ?boolean) => {
+    const index = dialog && dialog.idx;
+    invariant(typeof index === "number", "Unexpected dialog state");
     return (
       <Dialog
         modal={true}
@@ -126,12 +139,7 @@ const Excel = props => {
         hasCancel={!readonly}
         onAction={_saveDataDialog}
       >
-        <Form
-          ref={formRef}
-          fields={props.schema}
-          initialData={data[dialog.idx]}
-          readonly={readonly}
-        />
+        <Form ref={formRef} recordId={index} readonly={readonly} />
       </Dialog>
     );
   };
@@ -141,7 +149,7 @@ const Excel = props => {
       <table>
         <thead>
           <tr>
-            {props.schema.map(item => {
+            {schema.map(item => {
               if (!item.show) {
                 return null;
               }
@@ -153,44 +161,37 @@ const Excel = props => {
                 <th
                   className={`schema-${item.id}`}
                   key={item.id}
-                  onClick={() => {
-                    _sort(item.id);
-                  }}
+                  onClick={_sort.bind(this, item.id)}
                 >
                   {title}
                 </th>
               );
             }, this)}
-            <th className="ExcelNotSortable">Actions</th>
+            <th className="ExcelNotSortable">操作</th>
           </tr>
         </thead>
-        <tbody
-          onDoubleClick={e => {
-            _showEditor(e);
-          }}
-        >
+        <tbody onDoubleClick={_showEditor}>
           {data &&
             data.map((row, rowidx) => {
               return (
                 <tr key={rowidx}>
                   {Object.keys(row).map((cell, idx) => {
-                    const schema = props.schema[idx];
-                    if (!schema || !schema.show) {
+                    if (!schema[idx] || !schema[idx].show) {
                       return null;
                     }
-                    const isRating = schema.type === "rating";
+                    const isRating = schema[idx].type === "rating";
                     let content = row[cell];
                     if (
                       !isRating &&
                       edit &&
                       edit.row === rowidx &&
-                      edit.key === schema.id
+                      edit.key === schema[idx].id
                     ) {
                       content = (
                         <form onSubmit={_save}>
                           <FormInput
                             ref={formInputRef}
-                            {...schema}
+                            {...schema[idx]}
                             defaultValue={content}
                           />
                         </form>
@@ -206,16 +207,17 @@ const Excel = props => {
                     return (
                       <td
                         className={classNames({
-                          [`schema-${schema.id}`]: true,
+                          [`schema-${schema[idx].id}`]: true,
                           ExcelEditable: !isRating,
-                          ExcelDataLeft: schema.align === "left",
-                          ExcelDataRight: schema.align === "right",
+                          ExcelDataLeft: schema[idx].align === "left",
+                          ExcelDataRight: schema[idx].align === "right",
                           ExcelDataCenter:
-                            schema.align !== "left" && schema.align !== "right"
+                            schema[idx].align !== "left" &&
+                            schema[idx].align !== "right"
                         })}
                         key={idx}
                         data-row={rowidx}
-                        data-key={schema.id}
+                        data-key={schema[idx].id}
                       >
                         {content}
                       </td>
@@ -238,12 +240,6 @@ const Excel = props => {
       {_renderDialog()}
     </div>
   );
-};
-
-Excel.propTypes = {
-  schema: PropTypes.arrayOf(PropTypes.object),
-  initialData: PropTypes.arrayOf(PropTypes.object),
-  onDataChange: PropTypes.func
 };
 
 export default Excel;

@@ -1,4 +1,5 @@
-import classNames from "classnames";
+/* @flow */
+
 import React, {
   forwardRef,
   useCallback,
@@ -6,11 +7,18 @@ import React, {
   useImperativeHandle,
   useState
 } from "react";
-import PropTypes from "prop-types";
+import classNames from "classnames";
 
-const Rating = forwardRef((props, ref) => {
-  const [rating, setRating] = useState(props.defaultValue);
-  const [tmpRating, setTmpRating] = useState(props.defaultValue);
+type Props = {
+  id?: string,
+  defaultValue: number,
+  readonly: boolean,
+  max: number
+};
+
+const Rating = forwardRef((props: Props, ref: any) => {
+  const [rating, setRating]: number = useState(props.defaultValue);
+  const [tmpRating, setTmpRating]: number = useState(props.defaultValue);
 
   const onClickHandler = useCallback(
     value => {
@@ -36,8 +44,8 @@ const Rating = forwardRef((props, ref) => {
     setTmpRating(props.defaultValue);
   }, [props.defaultValue]);
 
-  useImperativeHandle(ref, () => ({
-    getValue() {
+  useImperativeHandle((ref: any), () => ({
+    getValue(): number {
       return rating;
     }
   }));
@@ -75,15 +83,10 @@ const Rating = forwardRef((props, ref) => {
   );
 });
 
-Rating.propTypes = {
-  defaultValue: PropTypes.number,
-  readonly: PropTypes.bool,
-  max: PropTypes.number
-};
-
 Rating.defaultProps = {
   defaultValue: 0,
-  max: 5
+  max: 5,
+  readonly: false
 };
 
 export default Rating;

@@ -1,16 +1,23 @@
-import React, { forwardRef, useImperativeHandle, useState } from "react";
-import PropTypes from "prop-types";
+/* @flow */
 
-const Suggest = forwardRef((props, ref) => {
-  const [value, setValue] = useState(props.defaultValue);
+import React, { forwardRef, useImperativeHandle, useState } from "react";
+
+type Props = {
+  id?: string,
+  defaultValue?: string | number,
+  options: Array<string>
+};
+
+const Suggest = forwardRef((props: Props, ref: any) => {
+  const [value, setValue]: string | number = useState(props.defaultValue);
 
   useImperativeHandle(ref, () => ({
-    getValue() {
+    getValue(): string | number {
       return value;
     }
   }));
 
-  const randomid = Math.random()
+  const randomid: string = Math.random()
     .toString(16)
     .substring(2);
 
@@ -30,11 +37,5 @@ const Suggest = forwardRef((props, ref) => {
     </div>
   );
 });
-
-Suggest.propTypes = {
-  id: PropTypes.string,
-  defaultValue: PropTypes.string,
-  options: PropTypes.arrayOf(PropTypes.string)
-};
 
 export default Suggest;

@@ -1,3 +1,6 @@
+/* @flow */
+
+import CRUDStore from "../flux-imm/CRUDStore";
 import FormInput from "./FormInput";
 import Rating from "./Rating";
 import React, {
@@ -6,19 +9,32 @@ import React, {
   useImperativeHandle,
   useState
 } from "react";
-import PropTypes from "prop-types";
 
-const Form = forwardRef((props, ref) => {
+import type { FormInputField, FormInputFieldValue } from "./FormInput";
+
+type Props = {
+  readonly?: boolean,
+  recordId?: number
+};
+
+const Form = forwardRef((props: Props, ref: any) => {
   const [itemRefs] = useState(() => {
     let items = {};
-    props.fields.forEach(field => (items[field.id] = createRef()));
+    CRUDStore.getSchema().forEach(field => (items[field.id] = createRef()));
     return items;
   });
 
-  useImperativeHandle(ref, () => ({
+  const [fields]: Array<Object> = useState(CRUDStore.getSchema());
+  const [initialData]: ?Object = useState(() => {
+    if ("recordId" in props) {
+      return CRUDStore.getRecord(props.recordId);
+    }
+  });
+
+  useImperativeHandle((ref: any), () => ({
     getData() {
       let data = {};
-      props.fields.forEach(field => {
+      fields.forEach(field => {
         data[field.id] = itemRefs[field.id].current.getValue();
       });
       return data;
@@ -27,8 +43,9 @@ const Form = forwardRef((props, ref) => {
 
   return (
     <form className="Form">
-      {props.fields.map(field => {
-        const prefilled = props.initialData && props.initialData[field.id];
+      {fields.map((field: FormInputField) => {
+        const prefilled: FormInputFieldValue =
+          (initialData && initialData[field.id]) || "";
         if (!props.readonly) {
           return (
             <div className="FormRow" key={field.id}>
@@ -64,18 +81,5 @@ const Form = forwardRef((props, ref) => {
     </form>
   );
 });
-
-Form.propTypes = {
-  fields: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      label: PropTypes.string.isRequired,
-      type: PropTypes.string,
-      options: PropTypes.arrayOf(PropTypes.string)
-    })
-  ).isRequired,
-  initialData: PropTypes.object,
-  readonly: PropTypes.bool
-};
 
 export default Form;

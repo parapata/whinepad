@@ -1,15 +1,29 @@
+/* @flow */
+
 import Button from "./Button";
 import React, { useEffect } from "react";
-import PropTypes from "prop-types";
 
-const Dialog = props => {
+type Props = {
+  header: string,
+  confirmLabel: string,
+  modal: boolean,
+  onAction: Function,
+  hasCancel: ?boolean,
+  children?: any
+};
+
+const Dialog = (props: Props) => {
   useEffect(() => {
     if (props.modal) {
-      document.body.classList.add("DialogModalOpen");
+      if (document.body) {
+        document.body.classList.add("DialogModalOpen");
+      }
     } else {
-      document.body.classList.remove("DialogModalOpen");
+      if (document.body) {
+        document.body.classList.remove("DialogModalOpen");
+      }
     }
-  }, [props.modal]);
+  });
 
   return (
     <div className={props.modal ? "Dialog DialogModal" : "Dialog"}>
@@ -39,18 +53,10 @@ const Dialog = props => {
   );
 };
 
-Dialog.propTypes = {
-  header: PropTypes.string.isRequired,
-  confirmLabel: PropTypes.string,
-  modal: PropTypes.bool,
-  onAction: PropTypes.func,
-  hasCancel: PropTypes.bool
-};
-
 Dialog.defaultProps = {
   confirmLabel: "Ok",
   modal: false,
-  onAction: () => {},
+  onAction: (_: any) => {},
   hasCancel: true
 };
 

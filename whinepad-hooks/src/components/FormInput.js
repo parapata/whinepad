@@ -1,24 +1,37 @@
+/* @flow */
+
 import Rating from "./Rating";
 import React, { forwardRef, useImperativeHandle, useRef } from "react";
-import PropTypes from "prop-types";
 import Suggest from "./Suggest";
 
-const FormInput = forwardRef((props, ref) => {
+type FormInputFieldType = "year" | "suggest" | "rating" | "text" | "input";
+
+export type FormInputFieldValue = string | number;
+
+export type FormInputField = {
+  type: FormInputFieldType,
+  defaultValue?: FormInputFieldValue,
+  id?: string,
+  options?: Array<string>,
+  label?: string
+};
+
+const FormInput = forwardRef((props: FormInputField, ref: any) => {
   const childRef = useRef();
 
-  useImperativeHandle(ref, () => ({
+  const common: Object = {
+    id: props.id,
+    ref: childRef,
+    defaultValue: props.defaultValue
+  };
+
+  useImperativeHandle((ref: any), () => ({
     getValue() {
       return "value" in childRef.current
         ? childRef.current.value
         : childRef.current.getValue();
     }
   }));
-
-  const common = {
-    id: props.id,
-    ref: childRef,
-    defaultValue: props.defaultValue
-  };
 
   switch (props.type) {
     case "year":
@@ -27,7 +40,6 @@ const FormInput = forwardRef((props, ref) => {
           {...common}
           type="number"
           defaultValue={props.defaultValue || new Date().getFullYear()}
-          ref={childRef}
         />
       );
     case "suggest":
@@ -43,11 +55,8 @@ const FormInput = forwardRef((props, ref) => {
   }
 });
 
-FormInput.propTypes = {
-  type: PropTypes.oneOf(["year", "suggest", "rating", "text", "input"]),
-  id: PropTypes.string,
-  options: PropTypes.array,
-  defaultValue: PropTypes.any
+FormInput.defaultProps = {
+  type: "input"
 };
 
 export default FormInput;

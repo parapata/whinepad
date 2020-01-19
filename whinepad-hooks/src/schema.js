@@ -1,40 +1,42 @@
+/* @flow */
+
 import classification from "./classification";
 
 export default [
   {
     id: "name",
-    label: "Name",
+    label: "名前",
     show: true,
-    sample: "$2 chuck",
+    sample: "2ドルのシャック",
     align: "left"
   },
   {
     id: "year",
-    label: "Year",
+    label: "年",
     type: "year",
     show: true,
     sample: 2015
   },
   {
     id: "grape",
-    label: "Grape",
+    label: "ぶどう",
     type: "suggest",
     options: classification.grapes,
     show: true,
-    sample: "Merlot",
+    sample: "メルロー",
     align: "left"
   },
   {
     id: "rating",
-    label: "Rating",
+    label: "評価",
     type: "rating",
     show: true,
     sample: 3
   },
   {
     id: "comments",
-    label: "Comments",
+    label: "コメント",
     type: "text",
-    sample: "Nice for the price"
+    sample: "値段の割によい"
   }
 ];

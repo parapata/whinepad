@@ -1,71 +1,34 @@
+/* @flow */
+
 import Button from "./Button";
+import CRUDActions from "../flux-imm/CRUDActions";
+import CRUDStore from "../flux-imm/CRUDStore";
 import Dialog from "./Dialog";
 import Excel from "./Excel";
 import Form from "./Form";
-import React, { useRef, useState } from "react";
-import PropTypes from "prop-types";
+import React, { useEffect, useRef, useState } from "react";
 
-const Whinepad = props => {
-  const [data, setData] = useState(props.initialData);
-  const [addnew, setAddnew] = useState(false);
-  const [preSearchData, setPreSearchData] = useState();
+const Whinepad = () => {
+  const [count, setCount]: number = useState(CRUDStore.getCount());
+  const [addnew, setAddnew]: boolean = useState(false);
 
   const formRef = useRef();
+
+  CRUDStore.addListener("change", () => {
+    setCount(CRUDStore.getCount());
+  });
+
+  useEffect(() => {}, [addnew, count]);
 
   const _addNewDialog = () => {
     setAddnew(true);
   };
 
-  const _addNew = action => {
-    if (action === "dismiss") {
-      setAddnew(false);
-      return;
-    }
-    let workData = Array.from(data);
-    workData.unshift(formRef.current.getData());
+  const _addNew = (action: string) => {
     setAddnew(false);
-    setData(workData);
-    _commitToStorage(workData);
-  };
-
-  const _onExcelDataChange = newData => {
-    setData(newData);
-    _commitToStorage(newData);
-  };
-
-  const _commitToStorage = data => {
-    localStorage.setItem("data", JSON.stringify(data));
-  };
-
-  const _startSearching = () => {
-    setPreSearchData(data);
-  };
-
-  const _doneSearching = () => {
-    setData(preSearchData);
-  };
-
-  const _search = e => {
-    const needle = e.target.value.toLowerCase();
-    if (!needle) {
-      setData(preSearchData);
-      return;
+    if (action === "confirm") {
+      CRUDActions.create(formRef.current.getData());
     }
-    const fields = props.schema.map(item => item.id);
-    const searchdata = preSearchData.filter(row => {
-      for (let f = 0; f < fields.length; f++) {
-        if (
-          row[fields[f]]
-            .toString()
-            .toLowerCase()
-            .indexOf(needle) > -1
-        ) {
-          return true;
-        }
-      }
-      return false;
-    });
-    setData(searchdata);
   };
 
   return (
@@ -73,24 +36,19 @@ const Whinepad = props => {
       <div className="WhinepadToolbar">
         <div className="WhinepadToolbarAdd">
           <Button onClick={_addNewDialog} className="WhinepadToolbarAddButton">
-            + add
+            + 追加
           </Button>
         </div>
         <div className="WhinepadToolbarSearch">
           <input
-            placeholder="Search..."
-            onChange={_search}
-            onFocus={_startSearching}
-            onBlur={_doneSearching}
+            placeholder={`${count}件から検索...`}
+            onChange={CRUDActions.search.bind(CRUDActions)}
+            onFocus={CRUDActions.startSearching.bind(CRUDActions)}
           />
         </div>
       </div>
       <div className="WhinepadDatagrid">
-        <Excel
-          schema={props.schema}
-          initialData={data}
-          onDataChange={_onExcelDataChange}
-        />
+        <Excel />
       </div>
       {addnew ? (
         <Dialog
@@ -99,16 +57,11 @@ const Whinepad = props => {
           confirmLabel="Add"
           onAction={_addNew}
         >
-          <Form ref={formRef} fields={props.schema} />
+          <Form ref={formRef} />
         </Dialog>
       ) : null}
     </div>
   );
-};
-
-Whinepad.propTypes = {
-  schema: PropTypes.arrayOf(PropTypes.object),
-  initialData: PropTypes.arrayOf(PropTypes.object)
 };
 
 export default Whinepad;
